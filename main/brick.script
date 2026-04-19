@@ -1,0 +1,24 @@
+local brick_colors = {
+	red = vmath.vector4(1, 0.2, 0.2, 1),
+	orange = vmath.vector4(1, 0.6, 0.2, 1),
+	yellow = vmath.vector4(1, 1, 0.2, 1),
+	green = vmath.vector4(0.2, 1, 0.2, 1),
+	blue = vmath.vector4(0.2, 0.6, 1, 1)
+}
+
+function init(self)
+	-- 默认白色
+	go.set("#sprite", "tint", vmath.vector4(1, 1, 1, 1))
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("set_color") then
+		local color = brick_colors[message.color]
+		if color then
+			go.set("#sprite", "tint", color)
+		end
+	elseif message_id == hash("hit") then
+		msg.post("main", "brick_destroyed")
+		go.delete()
+	end
+end

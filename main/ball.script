@@ -1,0 +1,59 @@
+local speed = 400
+local screen_width = 960
+local screen_height = 640
+local ball_radius = 10
+
+function init(self)
+	self.position = go.get_position()
+	self.velocity = vmath.vector3(0, 0, 0)
+	self.is_moving = false
+end
+
+function update(self, dt)
+	if self.is_moving then
+		-- 物理移动
+		self.position = self.position + self.velocity * dt
+		go.set_position(self.position)
+		
+		-- 边界碰撞
+		if self.position.x <= ball_radius or self.position.x >= screen_width - ball_radius then
+			self.velocity.x = -self.velocity.x
+		end
+		if self.position.y >= screen_height - ball_radius then
+			self.velocity.y = -self.velocity.y
+		end
+		
+		-- 掉落检测
+		if self.position.y < -20 then
+			self.is_moving = false
+			msg.post("main", "ball_lost")
+		end
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("reset") then
+		print("Ball received RESET")
+		self.position = vmath.vector3(screen_width / 2, 100, 0.2)
+		go.set_position(self.position)
+		
+		-- 随机发射方向
+		local angle = math.rad(math.random(45, 135))
+		self.velocity = vmath.vector3(math.cos(angle), math.sin(angle), 0) * speed
+		self.is_moving = true
+	elseif message_id == hash("contact_point_response") then
+		if message.distance > 0 then
+			-- 反弹逻辑
+			if math.abs(message.normal.x) > math.abs(message.normal.y) then
+				self.velocity.x = math.abs(self.velocity.x) * (message.normal.x > 0 and 1 or -1)
+			else
+				self.velocity.y = math.abs(self.velocity.y) * (message.normal.y > 0 and 1 or -1)
+			end
+			
+			-- 撞击砖块
+			if message.other_group == hash("brick") then
+				msg.post(message.other_id, "hit")
+			end
+		end
+	end
+end
