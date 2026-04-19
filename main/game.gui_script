@@ -1,0 +1,12 @@
+function on_message(self, message_id, message, sender)
+	if message_id == hash("update_score") then
+		gui.set_text(gui.get_node("score"), "SCORE: " .. message.score)
+	elseif message_id == hash("update_lives") then
+		gui.set_text(gui.get_node("lives"), "LIVES: " .. message.lives)
+	elseif message_id == hash("show_message") then
+		gui.set_text(gui.get_node("message"), message.text)
+		gui.set_enabled(gui.get_node("message"), true)
+	elseif message_id == hash("hide_message") then
+		gui.set_enabled(gui.get_node("message"), false)
+	end
+end

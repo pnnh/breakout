@@ -55,5 +55,8 @@ function on_message(self, message_id, message, sender)
 				msg.post(message.other_id, "hit")
 			end
 		end
+	elseif message_id == hash("stop") then
+		self.is_moving = false
+		self.velocity = vmath.vector3(0, 0, 0)
 	end
 end
