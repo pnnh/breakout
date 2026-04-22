@@ -9,3 +9,5 @@ Thumbs.db
 .project
 .cproject
 builtins
+# 导出的 bundle 文件夹
+/bundle
